@@ -5,8 +5,8 @@ Plugin URI: https://github.com/Machigatta/wshbr-wordpress-themoviedb-sidebar
 Description: wshbr.de - Provides a sidebar with information from https://www.themoviedb.org
 Author: Machigatta
 Author URI: https://machigatta.com/
-Version: 0.1
-Stable Tag: 0.1
+Version: 1.0
+Stable Tag: 1.0
 */
 
 class wtmds
