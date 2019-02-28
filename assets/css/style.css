@@ -1,0 +1,66 @@
+.wtmds-container {
+        margin-top: 0;
+        padding-top: 0;
+}
+
+.wtmds-container>.intro-block {
+        max-width: 100%;
+        text-align: center;
+}
+
+.wtmds-container>.intro-block>img {
+        max-width: 100%;
+}
+
+.wtmds-container>.intro-block>h3, .wtmds-container>.content_bringer>h4 {
+        font-family: 'Anton', cursive;
+}
+
+.seasonContainer>table, .seasonContainer>table>tbody, .seasonContainer>table>tbody>tr {
+        width: 100%;
+}
+
+.seasonContainer>table>tbody>tr>td {
+        width: auto;
+        border: 2px solid #ccc;
+        height: 20px;
+        text-align: center;
+        cursor: pointer;
+        color: white;
+}
+
+.seasonEpisodePlanned {
+        background-color: rgb(195, 21, 21);
+}
+
+.seasonEpisodePublished {
+        background-color: green;
+}
+
+.seasonEpisodeUnknown {
+        background-color: blue;
+}
+
+.seasonContainer {
+        padding: 5px;
+}
+
+.seasonContainer>span {
+        font-weight: bold;
+}
+
+.content_bringercontent_bringer>p {
+        padding: 5px;
+}
+
+.content_handlung {
+        text-align: justify;
+        max-height: 250px;
+        text-overflow: ellipsis;
+        font-size: 85%;
+        overflow-wrap: break-word;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 14;
+        -webkit-box-orient: vertical;
+}

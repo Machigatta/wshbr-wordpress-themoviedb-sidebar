@@ -5,15 +5,25 @@ A simple wordpress plugin to grab information for a movie or series from https:/
 # Features:
 - Registering Configs
 - Adding TMDB-IDs to posts
+- Print Out Template for Sidebar in https://github.com/Machigatta/wshbr-wordpress-theme
+- Provide Shortcode for Pages
+- Provide Function for Themes
+
+
+### Template-Usage:
+```php
+if (function_exists('tmdb_sidebar')) { tmdb_sidebar(); }
+```
+
+### Shortcode:
+```php
+[tmdb_sidebar]
+```
 
 # To-Do: 
-- View and Cach Management in from the plugin site
-- Clear Cache
-- Build shortcode and function for themes
-- Include in 
-
+- Clear Cache by Button in Backend
 
 ---
 Build for https://github.com/Machigatta/wshbr-wordpress-theme
 
-`Version: 0.1`
+`Version: 1.0`
