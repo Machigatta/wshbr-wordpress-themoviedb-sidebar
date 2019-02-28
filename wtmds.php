@@ -5,8 +5,8 @@ Plugin URI: https://github.com/Machigatta/wshbr-wordpress-themoviedb-sidebar
 Description: wshbr.de - Provides a sidebar with information from https://www.themoviedb.org
 Author: Machigatta
 Author URI: https://machigatta.com/
-Version: 1.0
-Stable Tag: 1.0
+Version: 1.1
+Stable Tag: 1.1
 */
 
 class wtmds
@@ -88,7 +88,7 @@ class wtmds
 
 	function addStylesAndScripts(){
 		wp_enqueue_style('tmbd-sidebar-style',  trailingslashit(plugin_dir_url(__FILE__)) . 'assets/css/style.css',array(),'0.0.3');
-		wp_enqueue_script('tmdb-sidebar-script',  trailingslashit(plugin_dir_url(__FILE__)) . 'assets/js/main.js',array('jquery'),'0.0.4');
+		wp_enqueue_script('tmdb-sidebar-script',  trailingslashit(plugin_dir_url(__FILE__)) . 'assets/js/main.js',array('jquery'),'0.0.6');
 	}
 
 	public function renderSidebar($post_object){

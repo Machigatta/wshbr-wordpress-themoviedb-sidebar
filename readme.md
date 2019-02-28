@@ -26,4 +26,4 @@ if (function_exists('tmdb_sidebar')) { tmdb_sidebar(); }
 ---
 Build for https://github.com/Machigatta/wshbr-wordpress-theme
 
-`Version: 1.0`
+`Version: 1.1`
