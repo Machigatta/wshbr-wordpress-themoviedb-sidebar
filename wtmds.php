@@ -13,7 +13,6 @@ class wtmds
 {
 	public function __construct() {
 		add_action('plugins_loaded', 'wtmds_init');
-		add_action( 'save_post', 'wtmds_imdb_data' );
 		add_action('admin_init', 'wtmds_config_init');
 		add_shortcode('tmdb_sidebar', array($this, 'shortCode'));
 		add_action('wp_enqueue_scripts', array($this, 'addStylesAndScripts'));
@@ -25,19 +24,7 @@ class wtmds
 		load_plugin_textdomain( 'wtmds', null, $plugin_dir.'/languages/' );
 	}
 
-	//After save -> save the id
-	function wtmds_imdb_data($post_id){
-		// check if this isn't an auto save
-		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )
-			return;
-		// security check
-		if ( !wp_verify_nonce( $_POST['wtmds_nonce'], plugin_basename( __FILE__ ) ) )
-			return;
-		
-		if ( isset( $_POST['imdb_id'] ) ) :
-			update_post_meta( $post_id, 'imdb_id', $_POST['imdb_id'] );
-		endif;        
-	}
+
 
 	//Retrieve the Post Object
 	function getPostObject($post_id) {
@@ -172,3 +159,19 @@ function wtmds_imdb_box($post) {
 }
 
 add_action ('add_meta_boxes','wtmds_meta_custom');
+
+//After save -> save the id
+function wtmds_imdb_data($post_id){
+	// check if this isn't an auto save
+	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )
+		return;
+	// security check
+	if ( !wp_verify_nonce( $_POST['wtmds_nonce'], plugin_basename( __FILE__ ) ) )
+		return;
+	
+	if ( isset( $_POST['imdb_id'] ) ) :
+		update_post_meta( $post_id, 'imdb_id', $_POST['imdb_id'] );
+	endif;        
+}
+
+add_action( 'save_post', 'wtmds_imdb_data' );
