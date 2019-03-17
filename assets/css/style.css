@@ -64,3 +64,11 @@
         -webkit-line-clamp: 14;
         -webkit-box-orient: vertical;
 }
+
+.sidebar-links {
+        text-align: center;
+}
+
+.sidebar-links > a {
+        color: rgb(48, 48, 48);
+}

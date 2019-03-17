@@ -24,7 +24,7 @@ class SBLoader
 
     public function draw(){
         if($this->tmdb->type != null && $this->tmdb->id != null && $this->tmdb->language != null){
-            $resObj = $this->requestToTMDB($this->tmdb->type, $this->tmdb->id, "&append_to_response=content_ratings&language=".$this->tmdb->language);
+            $resObj = $this->requestToTMDB($this->tmdb->type, $this->tmdb->id, "&append_to_response=content_ratings,external_ids&language=".$this->tmdb->language);
             ?>
             <div class="sidebar-block wtmds-container">
                 <div class="intro-block">
@@ -100,11 +100,14 @@ class SBLoader
                         </div>
                         <hr>
                     <?php 
-                        if($resObj->status == "Released"){
+                        if($resObj->first_air_date != ""){
                             $this->drawContentBasedOnObject("Original Sprache",$resObj);
                             $this->drawContentBasedOnObject("Altersfreigabe",$resObj);
+                            $this->drawContentBasedOnObject("Laufzeit",$resObj);
                         }
                         $this->drawContentBasedOnObject("Genres",$resObj);
+                        $this->drawContentBasedOnObject("Sender",$resObj);
+                        $this->drawContentBasedOnObject("Links",$resObj);
                     }else if ($this->tmdb->type == "movie"){
                         if($resObj->status == "Released"){
                             $this->drawContentBasedOnObject("Veröffentlichung",$resObj);
@@ -112,7 +115,8 @@ class SBLoader
                             $this->drawContentBasedOnObject("Einspielergebnis",$resObj);
                             $this->drawContentBasedOnObject("Laufzeit",$resObj);
                         }
-                        $this->drawContentBasedOnObject("Genres",$resObj);                        
+                        $this->drawContentBasedOnObject("Genres",$resObj);       
+                        $this->drawContentBasedOnObject("Links",$resObj);                 
                     }
                 ?>        
             </div>
@@ -165,11 +169,44 @@ class SBLoader
                         echo '<p><span class="label label-default">'.number_format($resObj->budget+$resObj->revenue).' $</span></p>';
                         break;
                     case 'Laufzeit':
-                        echo '<p><span class="label label-default">'.$resObj->runtime.' min</span></p>';
+                        if (isset($resObj->episode_run_time)) {
+                            echo "<p>";
+                            foreach ($resObj->episode_run_time as $value) {
+                                echo '<span class="label label-default">'.$value.' min</span>&nbsp;';
+                            }
+                            echo "</p>";
+                        }else{
+                            echo '<p><span class="label label-default">'.$resObj->runtime.' min</span></p>';
+                        }
+                        
                         break;
                     case 'Veröffentlichung':
                         echo '<p><span class="label label-default">'.date("d.m.Y",strtotime($resObj->release_date)).'</span></p>';
-                        break;    
+                        break;
+                    case 'Sender':
+                        foreach ($resObj->networks as $obj) {
+                            echo '<img src="https://image.tmdb.org/t/p/h30'.$obj->logo_path.'" alt="'.$obj->name.'" title='.$obj->name.'>';
+                        }
+                        break;
+                    case 'Links':
+                        echo "<p class='sidebar-links'>";
+                        if ($resObj->external_ids->facebook_id != null) {
+                            echo '<a href="https://www.facebook.com/'.$resObj->external_ids->facebook_id.'"><i class="fab fa-facebook fa-2x"></i></a>&nbsp;';
+                        }
+                        if ($resObj->external_ids->instagram_id != null) {
+                            echo '<a href="https://instagram.com/'.$resObj->external_ids->instagram_id.'"><i class="fab fa-instagram fa-2x"></i></a>&nbsp;';
+                        }
+                        if ($resObj->external_ids->twitter_id != null) {
+                            echo '<a href="https://twitter.com/'.$resObj->external_ids->twitter_id.'"><i class="fab fa-twitter fa-2x"></i></a>&nbsp;';
+                        }
+                        if ($resObj->external_ids->imdb_id != null) {
+                            echo '<a href="https://www.imdb.com/'.$resObj->external_ids->imdb_id.'"><i class="fab fa-imdb fa-2x"></i></a>&nbsp;';
+                        }
+                        if ($resObj->homepage != null) {
+                            echo '<a href="'.$resObj->homepage.'"><i class="fas fa-link fa-2x"></i></a>&nbsp;';
+                        }
+                        echo "</p>";
+                        break;
                     default:
                         break;
                 }
