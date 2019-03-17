@@ -1,118 +1,185 @@
 <?php
+error_reporting(E_ALL);
 require (__DIR__."/CURLManager.php");
 
+class SBLoader
+{
+    private $tmdb;
 
-if(isset($_POST["id"])){
+    public function __construct() {
+        if(isset($_POST["id"])){
+            $this->tmdb->type = $_POST["type"];
+            $this->tmdb->id = $_POST["id"];
+            $this->tmdb->language = "de-DE";
+        }
+    }
 
-$tmdb->type = $_POST["type"];
-$tmdb->id = $_POST["id"];
-$tmdb->language = "de-DE";
+    private function requestToTMDB($interface, $subinterface, $params = ""){
+        $cm = new CURLManager();
+        $url = ("https://api.themoviedb.org/3/".$interface."/".$subinterface."?api_key=1c0dd61d7bac5cb8312a0b5c4f2b72db".$params);
+        $json = $cm->fetchJSON($url);
+        $obj = json_decode($json);
+        return $obj;
+    }
 
-$resObj = requestToTMDB($tmdb->type, $tmdb->id, "&append_to_response=credits&language=".$tmdb->language);
-    ?>
-    <div class="sidebar-block wtmds-container">
-        <div class="intro-block">
-			<?php
-                $title = "";
-                $type = "";
-				if($tmdb->type == "tv"){
-                    $title = $resObj->name;
-                    $type = "serie";
-				}else if($tmdb->type == "movie"){
-                    $title = $resObj->title;
-                    $type = "film";
-                }
-                
-                //untertitel
-                if(strpos($title, " – ")){
-                    $titleAr = explode(" – ",$title);
-                    $title = $titleAr[0] . "<p><small>".$titleAr[1]."</small></p>";
-                }
-                echo '<h3>'.$title.'</h3>';
-			?>
-            <img src="<?php echo('https://image.tmdb.org/t/p/w300_and_h450_bestv2/'.$resObj->poster_path); ?>" alt="">
-        </div>
-        <hr>
-        <?php 
-            if ($resObj->overview != "") {
+    public function draw(){
+        if($this->tmdb->type != null && $this->tmdb->id != null && $this->tmdb->language != null){
+            $resObj = $this->requestToTMDB($this->tmdb->type, $this->tmdb->id, "&append_to_response=content_ratings&language=".$this->tmdb->language);
             ?>
-                <div class="content_bringer">
-                    <h4>Handlung:</h4>
-                    <p class="content_handlung">
-                        <?php echo $resObj->overview;?>
-                    </p>
-                </div>
-                <hr>
-            <?php 
-            }
-        ?>
-        <?php 
-            if ( $tmdb->type == "tv" ) {
-            ?>
-                <div class="content_bringer">
-                    <span class="sidebar-head">Staffeln:</span>
+            <div class="sidebar-block wtmds-container">
+                <div class="intro-block">
                     <?php
-                    
-                    foreach ( $resObj->seasons as $season ) {
-                        if($season->season_number <= 0){
-                            continue;
+                        $title = "";
+                        $type = "";
+                        if($this->tmdb->type == "tv"){
+                            $title = $resObj->name;
+                            $type = "serie";
+                        }else if($this->tmdb->type == "movie"){
+                            $title = $resObj->title;
+                            $type = "film";
                         }
-                        echo '<div class="seasonContainer"><span>Staffel '.$season->season_number.'</span>:
-                        <table style="border-collapse: unset;"><tr>';
-                        $seasonResObj = requestToTMDB($tmdb->type, $tmdb->id."/season/".$season->season_number, "&language=".$tmdb->language);
-                        if(count($seasonResObj->episodes) <= 0){
-                            echo "<td class='seasonEpisodeUnknown'>Noch keine Angaben</td>";
+                        
+                        //untertitel
+                        if(strpos($title, " – ")){
+                            $titleAr = explode(" – ",$title);
+                            $title = $titleAr[0] . "<p><small>".$titleAr[1]."</small></p>";
                         }
-                        foreach ( $seasonResObj->episodes as $episodedata ) {
-                            echo '<td data-tooltip="'.$episodedata->name.'" class="t-top t-xl ';
-                            if(!$episodedata->air_date){
-                                echo ' seasonEpisodeUnknown ';
-                            }else if(time() > strtotime($episodedata->air_date) ){
-                                echo ' seasonEpisodePublished ';
-                            }else{
-                                echo ' seasonEpisodePlanned ';
-                            }
-                            echo '">'.$episodedata->episode_number.'</td>';
-                            if($episodedata->episode_number % 10 == 0){
-                                echo '</tr><tr>';
-                            }
-                        }
-                        echo '</tr></table></div>';
-                    }
-
+                        echo '<h3>'.$title.'</h3>';
                     ?>
+                    <img src="<?php echo('https://image.tmdb.org/t/p/w300_and_h450_bestv2/'.$resObj->poster_path); ?>" alt="">
                 </div>
                 <hr>
-            <?php 
-            }
-        ?>
-        <?php 
-            if (!count($resObj->genres) > 0) {
-            
-                echo '<div class="content_bringer">
-                      <span class="sidebar-head">Genres:</span>
-                            <p>';
-                            foreach ($resObj->genres as $genre) {
-                                echo "<span>" . $genre->name ."</span>";
+                <?php 
+                    if ($resObj->overview != "") {
+                    ?>
+                        <div class="content_bringer">
+                            <h4>Handlung:</h4>
+                            <p class="content_handlung">
+                                <?php echo $resObj->overview;?>
+                            </p>
+                        </div>
+                        <hr>
+                    <?php 
+                    }
+                ?>
+                <?php 
+                    if ( $this->tmdb->type == "tv" ) {
+                    ?>
+                        <div class="content_bringer">
+                            <h4 class="sidebar-head">Staffeln:</h4>
+                            <?php
+                            
+                            foreach ( $resObj->seasons as $season ) {
+                                if($season->season_number <= 0){
+                                    continue;
+                                }
+                                echo '<div class="seasonContainer"><span>Staffel '.$season->season_number.'</span>:
+                                <table style="border-collapse: unset;"><tr>';
+                                $seasonResObj = $this->requestToTMDB($this->tmdb->type, $this->tmdb->id."/season/".$season->season_number, "&language=".$this->tmdb->language);
+                                if(count($seasonResObj->episodes) <= 0){
+                                    echo "<td class='seasonEpisodeUnknown'>Noch keine Angaben</td>";
+                                }
+                                foreach ( $seasonResObj->episodes as $episodedata ) {
+                                    echo '<td data-tooltip="'.$episodedata->name.'" class="t-top t-xl ';
+                                    if(!$episodedata->air_date){
+                                        echo ' seasonEpisodeUnknown ';
+                                    }else if(time() > strtotime($episodedata->air_date) ){
+                                        echo ' seasonEpisodePublished ';
+                                    }else{
+                                        echo ' seasonEpisodePlanned ';
+                                    }
+                                    echo '">'.$episodedata->episode_number.'</td>';
+                                    if($episodedata->episode_number % 10 == 0){
+                                        echo '</tr><tr>';
+                                    }
+                                }
+                                echo '</tr></table></div>';
                             }
-                    echo '</p>
-                    </div>
-                    <hr>';
-            }
+
+                            ?>
+                        </div>
+                        <hr>
+                    <?php 
+                        if($resObj->status == "Released"){
+                            $this->drawContentBasedOnObject("Original Sprache",$resObj);
+                            $this->drawContentBasedOnObject("Altersfreigabe",$resObj);
+                        }
+                        $this->drawContentBasedOnObject("Genres",$resObj);
+                    }else if ($this->tmdb->type == "movie"){
+                        if($resObj->status == "Released"){
+                            $this->drawContentBasedOnObject("Veröffentlichung",$resObj);
+                            $this->drawContentBasedOnObject("Budget",$resObj);
+                            $this->drawContentBasedOnObject("Einspielergebnis",$resObj);
+                            $this->drawContentBasedOnObject("Laufzeit",$resObj);
+                        }
+                        $this->drawContentBasedOnObject("Genres",$resObj);                        
+                    }
+                ?>        
+            </div>
+        <?php  
+        }
+    }
+    
+    private function drawContentBasedOnObject($h, $resObj){
         ?>
-        
-    </div>
-
-
-    <?php  
+        <div class="content_bringer">
+            <h4 class="sidebar-head"><?php echo $h; ?>:</h4>
+            <div>
+            <?php
+                switch ($h) {
+                    case 'Genres':
+                        foreach ($resObj->genres as $key => $value) {
+                            echo '<span class="label label-default">'.$value->name.'</span> ';
+                        }
+                        break;
+                    case 'Original Sprache':
+                        echo '<span class="label label-default">'.$resObj->original_language.'</span> ';
+                        break;
+                    case 'Altersfreigabe':
+                        foreach ($resObj->content_ratings->results as $key => $value) {
+                            if($value->iso_3166_1 == "DE"){
+                                $color = "default";
+                                switch ($value->rating) {
+                                    case 12:
+                                        $color = "success";
+                                        break;
+                                    case 16:
+                                        $color = "primary";
+                                        break;
+                                    case 18:
+                                        $color = "danger";
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                echo '<span class="label label-'.$color.'">'.$value->rating.'</span> ';
+                            }
+                            
+                        }
+                        
+                        break;
+                    case 'Budget':
+                        echo '<p><span class="label label-default">'.number_format($resObj->budget).' $</span></p>';
+                        break;
+                    case 'Einspielergebnis':
+                        echo '<p><span class="label label-default">'.number_format($resObj->budget+$resObj->revenue).' $</span></p>';
+                        break;
+                    case 'Laufzeit':
+                        echo '<p><span class="label label-default">'.$resObj->runtime.' min</span></p>';
+                        break;
+                    case 'Veröffentlichung':
+                        echo '<p><span class="label label-default">'.date("d.m.Y",strtotime($resObj->release_date)).'</span></p>';
+                        break;    
+                    default:
+                        break;
+                }
+            ?>
+            </div>
+        </div>
+        <?php
+    } 
 }
 
-function requestToTMDB($interface, $subinterface, $params = ""){
-    $cm = new CURLManager();
-    $url = ("https://api.themoviedb.org/3/".$interface."/".$subinterface."?api_key=1c0dd61d7bac5cb8312a0b5c4f2b72db".$params);
-    $json = $cm->fetchJSON($url);
-    $obj = json_decode($json);
-    return $obj;
-}
-
+$SBLoader = new SBLoader();
+$SBLoader->draw();
 ?>
