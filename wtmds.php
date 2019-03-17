@@ -123,6 +123,14 @@ function tmdb_sidebar()
 	echo $wtmds->renderSidebar($post_object);
 }
 
+function is_tmdb_ready()
+{
+	// if (function_exists('tmdb_sidebar')) { tmdb_sidebar(); }
+	$wtmds = new wtmds();
+	$post_id = get_the_ID();
+	return $wtmds->getPostObject($post_id)["tmdb"][0] != null;
+}
+
 new wtmds();
 
 
